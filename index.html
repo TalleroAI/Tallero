@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tallero AI</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f4f6f8;
+}
+
+.header{
+    background:#1f2937;
+    color:white;
+    text-align:center;
+    padding:25px;
+}
+
+.header h1{
+    margin:0;
+    font-size:38px;
+}
+
+.header p{
+    margin-top:10px;
+    color:#d1d5db;
+}
+
+.chat-container{
+    max-width:900px;
+    margin:40px auto;
+    background:white;
+    border-radius:15px;
+    box-shadow:0 0 20px rgba(0,0,0,0.08);
+    padding:30px;
+}
+
+.messages{
+    height:400px;
+    overflow-y:auto;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.bot{
+    background:#eef2ff;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:15px;
+}
+
+.input-area{
+    display:flex;
+    gap:10px;
+}
+
+input{
+    flex:1;
+    padding:15px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    font-size:16px;
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:10px;
+    padding:15px 25px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+.footer{
+    text-align:center;
+    margin-top:20px;
+    color:#6b7280;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <h1>Tallero AI</h1>
+    <p>Asistente técnico para talleres y profesionales de automoción</p>
+</div>
+
+<div class="chat-container">
+
+    <div class="messages">
+
+        <div class="bot">
+            Hola. Soy Tallero AI.
+            <br><br>
+            Puedo ayudarte con:
+            <ul>
+                <li>Diagnóstico de averías</li>
+                <li>Códigos OBD</li>
+                <li>Mantenimiento</li>
+                <li>Información técnica</li>
+                <li>Recambios y consumibles</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="input-area">
+        <input type="text" placeholder="Escribe tu consulta...">
+        <button>Enviar</button>
+    </div>
+
+    <div class="footer">
+        Versión inicial de Tallero AI
+    </div>
+
+</div>
+
+</body>
+</html>
