@@ -119,15 +119,50 @@ button:hover{
     </div>
 
     <div class="input-area">
-        <input type="text" placeholder="Escribe tu consulta...">
-        <button>Enviar</button>
-    </div>
+    <input id="userInput" type="text" placeholder="Escribe tu consulta...">
+    <button onclick="enviarMensaje()">Enviar</button>
+</div>
 
     <div class="footer">
         Versión inicial de Tallero AI
     </div>
 
 </div>
+<script>
+async function enviarMensaje() {
 
+    const input = document.getElementById("userInput");
+    const mensaje = input.value;
+
+    if (!mensaje) return;
+
+    const respuesta = await fetch("/chat", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            message: mensaje
+        })
+    });
+
+    const data = await respuesta.json();
+
+    const mensajes = document.querySelector(".messages");
+
+    mensajes.innerHTML += `
+        <div class="bot">
+            <strong>Tú:</strong><br>
+            ${mensaje}
+        </div>
+        <div class="bot">
+            <strong>Tallero AI:</strong><br>
+            ${data.reply}
+        </div>
+    `;
+
+    input.value = "";
+}
+</script>
 </body>
 </html>
