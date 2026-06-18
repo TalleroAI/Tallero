@@ -129,24 +129,13 @@ button:hover{
 
 </div>
 <script>
-async function enviarMensaje() {
+let historial = [];
 
+async function enviarMensaje() {
     const input = document.getElementById("userInput");
-    const mensaje = input.value;
+    const mensaje = input.value.trim();
 
     if (!mensaje) return;
-
-    const respuesta = await fetch("/chat", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            message: mensaje
-        })
-    });
-
-    const data = await respuesta.json();
 
     const mensajes = document.querySelector(".messages");
 
@@ -155,13 +144,38 @@ async function enviarMensaje() {
             <strong>Tú:</strong><br>
             ${mensaje}
         </div>
+    `;
+
+    historial.push({
+        role: "user",
+        content: mensaje
+    });
+
+    input.value = "";
+
+    const respuesta = await fetch("/chat", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            messages: historial
+        })
+    });
+
+    const data = await respuesta.json();
+
+    mensajes.innerHTML += `
         <div class="bot">
             <strong>Tallero AI:</strong><br>
             ${data.reply}
         </div>
     `;
 
-    input.value = "";
+    historial.push({
+        role: "assistant",
+        content: data.reply
+    });
 }
 </script>
 </body>
