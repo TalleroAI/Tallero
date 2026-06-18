@@ -4,9 +4,7 @@ import os
 
 app = Flask(__name__)
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @app.route("/")
 def home():
@@ -14,33 +12,45 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-
     data = request.json
-    pregunta = data.get("message", "")
+    messages = data.get("messages", [])
 
-    respuesta = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=[
-            {
-                "role": "system",
-                "content": """Eres Tallero AI, un experto en automoción.
-Ayudas a talleres mecánicos con:
+    openai_messages = [
+        {
+            "role": "system",
+            "content": """Eres Tallero AI, un asistente técnico para talleres y profesionales de automoción.
+
+Responde siempre en español.
+
+Tu función es ayudar con:
 - diagnóstico de averías
 - códigos OBD
 - mantenimiento
 - recambios
-- información técnica"""
-            },
-            {
-                "role": "user",
-                "content": pregunta
-            }
-        ]
+- síntomas de vehículos
+- orientación técnica
+
+Mantén el contexto de la conversación.
+Si el usuario pregunta "cuánto costaría", usa los síntomas o vehículo mencionados antes.
+No inventes referencias exactas de recambios si faltan datos.
+Si falta información importante, pide marca, modelo, motor, año o código de avería."""
+        }
+    ]
+
+    openai_messages.extend(messages)
+
+    response = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        messages=openai_messages
     )
 
     return jsonify({
-        "reply": respuesta.choices[0].message.content
+        "reply": response.choices[0].message.content
     })
+
+@app.route("/health")
+def health():
+    return {"status": "ok", "message": "Tallero AI funcionando"}
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
