@@ -33,19 +33,22 @@ Normas de respuesta:
 - Utiliza párrafos cortos.
 - Cuando hables de averías, sigue este formato:
 
+Utiliza exactamente este formato:
+
 Diagnóstico probable:
-...
+Explicación breve.
 
 Comprobaciones recomendadas:
-- ...
-- ...
+- Comprobación 1
+- Comprobación 2
+- Comprobación 3
 
 Posibles soluciones:
-- ...
-- ...
+- Solución 1
+- Solución 2
 
 Coste orientativo:
-- ...
+Indica un rango de precios aproximado en euros.
 
 - Antes de recomendar sustituir piezas, indica las comprobaciones previas.
 - Mantén el contexto de la conversación.
