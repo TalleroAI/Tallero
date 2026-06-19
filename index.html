@@ -168,7 +168,7 @@ async function enviarMensaje() {
     mensajes.innerHTML += `
         <div class="bot">
             <strong>Tallero AI:</strong><br>
-            ${data.reply}
+            ${data.reply.replace(/\n/g, "<br>")}
         </div>
     `;
 
