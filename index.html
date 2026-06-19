@@ -145,7 +145,7 @@ async function enviarMensaje() {
             ${mensaje}
         </div>
     `;
-
+mensajes.scrollTop = mensajes.scrollHeight;
     historial.push({
         role: "user",
         content: mensaje
@@ -171,7 +171,7 @@ async function enviarMensaje() {
             ${data.reply.replace(/\n/g, "<br>")}
         </div>
     `;
-
+mensajes.scrollTop = mensajes.scrollHeight;
     historial.push({
         role: "assistant",
         content: data.reply
