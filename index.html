@@ -152,7 +152,24 @@ mensajes.scrollTop = mensajes.scrollHeight;
     });
 
     input.value = "";
+const estados = [
+    "Analizando avería...",
+    "Revisando posibles causas...",
+    "Comprobando síntomas...",
+    "Evaluando diagnóstico...",
+    "Procesando información del vehículo..."
+];
 
+const estadoAleatorio = estados[Math.floor(Math.random() * estados.length)];
+
+mensajes.innerHTML += `
+    <div class="bot thinking" id="thinking">
+        <strong>Tallero AI:</strong><br>
+        ${estadoAleatorio}
+    </div>
+`;
+
+mensajes.scrollTop = mensajes.scrollHeight;
     const respuesta = await fetch("/chat", {
         method: "POST",
         headers: {
@@ -164,7 +181,7 @@ mensajes.scrollTop = mensajes.scrollHeight;
     });
 
     const data = await respuesta.json();
-
+document.getElementById("thinking")?.remove();
     mensajes.innerHTML += `
         <div class="bot">
             <strong>Tallero AI:</strong><br>
