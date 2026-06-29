@@ -1,24 +1,77 @@
 from flask import Flask, request, jsonify, send_from_directory
 from openai import OpenAI
+from supabase import create_client
 import os
 
 app = Flask(__name__)
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 @app.route("/")
 def home():
     return send_from_directory(".", "index.html")
+def buscar_conocimiento_tallero(texto):
+    try:
+        palabras = texto.lower().split()
+        filtros = [p for p in palabras if len(p) >= 3]
 
+        if not filtros:
+            return ""
+
+        resultados = []
+
+        for palabra in filtros[:6]:
+            respuesta = (
+                supabase
+                .table("knowledge_items")
+                .select("titulo,resumen,motor,tags,json_completo")
+                .or_(f"titulo.ilike.%{palabra}%,resumen.ilike.%{palabra}%,motor.ilike.%{palabra}%,tags.ilike.%{palabra}%")
+                .limit(3)
+                .execute()
+            )
+
+            if respuesta.data:
+                resultados.extend(respuesta.data)
+
+        vistos = set()
+        documentos = []
+
+        for item in resultados:
+            titulo = item.get("titulo", "")
+            if titulo in vistos:
+                continue
+
+            vistos.add(titulo)
+
+            documentos.append(f"""
+Título: {item.get("titulo", "")}
+Motor: {item.get("motor", "")}
+Tags: {item.get("tags", "")}
+Resumen: {item.get("resumen", "")}
+JSON técnico: {item.get("json_completo", "")}
+""")
+
+            if len(documentos) >= 3:
+                break
+
+        return "\n\n".join(documentos)
+
+    except Exception as e:
+        print("Error buscando conocimiento en Supabase:", e)
+        return ""
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.json
     messages = data.get("messages", [])
-
+ultima_pregunta = messages[-1]["content"] if messages else ""
+conocimiento = buscar_conocimiento_tallero(ultima_pregunta)
     openai_messages = [
         {
             "role": "system",
-            "content": """
+            "content": f"""
 Eres Tallero AI, un asesor técnico especializado en automoción, diagnosis y gestión de talleres.
 
 Responde siempre en español.
@@ -78,6 +131,11 @@ Solo incluir esta sección si el usuario solicita precios o si el diagnóstico e
 - Si el usuario indica claramente una marca, modelo o motor diferente, considera cerrado el diagnóstico anterior.
 - El vehículo mencionado más recientemente por el usuario tiene prioridad sobre cualquier vehículo indicado anteriormente.
 - No reutilices averías, hipótesis o comprobaciones del vehículo anterior salvo que el usuario las relacione explícitamente.
+Si existe conocimiento interno relacionado con la consulta, úsalo como prioridad.
+
+Conocimiento interno:
+
+{conocimiento}
 """
         }
     ]
