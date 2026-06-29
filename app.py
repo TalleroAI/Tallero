@@ -140,14 +140,14 @@ Conocimiento interno:
         }
     ]
 
-    openai_messages.extend(messages)
+openai_messages.extend(messages)
 
-    response = client.chat.completions.create(
+response = client.chat.completions.create(
         model="gpt-4.1-mini",
         messages=openai_messages
     )
 
-    return jsonify({
+return jsonify({
         "reply": response.choices[0].message.content
     })
 
