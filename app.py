@@ -66,9 +66,9 @@ JSON técnico: {item.get("json_completo", "")}
 def chat():
     data = request.json
     messages = data.get("messages", [])
-ultima_pregunta = messages[-1]["content"] if messages else ""
-conocimiento = buscar_conocimiento_tallero(ultima_pregunta)
-    openai_messages = [
+    ultima_pregunta = messages[-1]["content"] if messages else ""
+    conocimiento = buscar_conocimiento_tallero(ultima_pregunta)
+openai_messages = [
         {
             "role": "system",
             "content": f"""
