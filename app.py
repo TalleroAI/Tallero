@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from openai import OpenAI
 from supabase import create_client
 import os
+import re
 
 app = Flask(__name__)
 
@@ -25,7 +26,7 @@ def buscar_conocimiento_tallero(texto):
         print("CONSULTA USUARIO:")
         print(texto)
 
-        palabras = texto.lower().split()
+        palabras = re.findall(r"[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]+", texto.lower())
         filtros = [p for p in palabras if len(p) >= 3]
 
         print("FILTROS GENERADOS:")
@@ -99,7 +100,6 @@ def chat():
     messages = data.get("messages", [])
 
     ultima_pregunta = messages[-1]["content"] if messages else ""
-    
     conocimiento = buscar_conocimiento_tallero(ultima_pregunta)
 
     print("CONOCIMIENTO FINAL ENVIADO AL MODELO:")
