@@ -22,8 +22,14 @@ def buscar_conocimiento_tallero(texto):
         if not texto:
             return ""
 
+        print("CONSULTA USUARIO:")
+        print(texto)
+
         palabras = texto.lower().split()
         filtros = [p for p in palabras if len(p) >= 3]
+
+        print("FILTROS GENERADOS:")
+        print(filtros)
 
         if not filtros:
             return ""
@@ -31,6 +37,9 @@ def buscar_conocimiento_tallero(texto):
         resultados = []
 
         for palabra in filtros[:6]:
+            print("BUSCANDO PALABRA EN SUPABASE:")
+            print(palabra)
+
             respuesta = (
                 supabase
                 .table("knowledge_items")
@@ -44,6 +53,9 @@ def buscar_conocimiento_tallero(texto):
                 .limit(3)
                 .execute()
             )
+
+            print("RESULTADOS SUPABASE:")
+            print(respuesta.data)
 
             if respuesta.data:
                 resultados.extend(respuesta.data)
@@ -70,10 +82,14 @@ JSON técnico: {item.get("json_completo", "")}
             if len(documentos) >= 3:
                 break
 
+        print("DOCUMENTOS ENCONTRADOS:")
+        print(documentos)
+
         return "\n\n".join(documentos)
 
     except Exception as e:
-        print("Error buscando conocimiento en Supabase:", e)
+        print("ERROR BUSCANDO CONOCIMIENTO EN SUPABASE:")
+        print(e)
         return ""
 
 
@@ -84,6 +100,9 @@ def chat():
 
     ultima_pregunta = messages[-1]["content"] if messages else ""
     conocimiento = buscar_conocimiento_tallero(ultima_pregunta)
+
+    print("CONOCIMIENTO FINAL ENVIADO AL MODELO:")
+    print(conocimiento)
 
     openai_messages = [
         {
