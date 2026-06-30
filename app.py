@@ -3,6 +3,7 @@ from openai import OpenAI
 from supabase import create_client
 import os
 import re
+import json
 
 app = Flask(__name__)
 
@@ -18,60 +19,65 @@ def home():
     return send_from_directory(".", "index.html")
 
 
+def limpiar_palabras(texto):
+    return re.findall(r"[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]+", texto.lower())
+
+
+def texto_item(item):
+    partes = [
+        str(item.get("titulo", "")),
+        str(item.get("resumen", "")),
+        str(item.get("motor", "")),
+        str(item.get("tags", "")),
+        json.dumps(item.get("json_completo", ""), ensure_ascii=False)
+    ]
+    return " ".join(partes).lower()
+
+
 def buscar_conocimiento_tallero(texto):
     try:
         if not texto:
             return ""
 
-        print("CONSULTA USUARIO:")
-        print(texto)
-
-        palabras = re.findall(r"[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]+", texto.lower())
+        palabras = limpiar_palabras(texto)
         filtros = [p for p in palabras if len(p) >= 3]
 
-        print("FILTROS GENERADOS:")
-        print(filtros)
+        print("CONSULTA USUARIO:", texto, flush=True)
+        print("FILTROS GENERADOS:", filtros, flush=True)
 
         if not filtros:
             return ""
 
+        respuesta = (
+            supabase
+            .table("knowledge_items")
+            .select("titulo,resumen,motor,tags,json_completo")
+            .limit(100)
+            .execute()
+        )
+
+        registros = respuesta.data or []
+
+        print("TOTAL REGISTROS SUPABASE:", len(registros), flush=True)
+
         resultados = []
 
-        for palabra in filtros[:6]:
-            print("BUSCANDO PALABRA EN SUPABASE:")
-            print(palabra)
+        for item in registros:
+            texto_completo = texto_item(item)
+            puntuacion = 0
 
-            respuesta = (
-                supabase
-                .table("knowledge_items")
-                .select("titulo,resumen,motor,tags,json_completo")
-                .or_(
-                    f"titulo.ilike.%{palabra}%,"
-                    f"resumen.ilike.%{palabra}%,"
-                    f"motor.ilike.%{palabra}%,"
-                    f"tags.ilike.%{palabra}%"
-                )
-                .limit(3)
-                .execute()
-            )
+            for palabra in filtros:
+                if palabra in texto_completo:
+                    puntuacion += 1
 
-            print("RESULTADOS SUPABASE:")
-            print(respuesta.data)
+            if puntuacion > 0:
+                resultados.append((puntuacion, item))
 
-            if respuesta.data:
-                resultados.extend(respuesta.data)
+        resultados.sort(key=lambda x: x[0], reverse=True)
 
-        vistos = set()
         documentos = []
 
-        for item in resultados:
-            titulo = item.get("titulo", "")
-
-            if titulo in vistos:
-                continue
-
-            vistos.add(titulo)
-
+        for puntuacion, item in resultados[:3]:
             documentos.append(f"""
 Título: {item.get("titulo", "")}
 Motor: {item.get("motor", "")}
@@ -80,17 +86,13 @@ Resumen: {item.get("resumen", "")}
 JSON técnico: {item.get("json_completo", "")}
 """)
 
-            if len(documentos) >= 3:
-                break
-
-        print("DOCUMENTOS ENCONTRADOS:")
-        print(documentos)
+        print("DOCUMENTOS ENCONTRADOS:", len(documentos), flush=True)
+        print(documentos, flush=True)
 
         return "\n\n".join(documentos)
 
     except Exception as e:
-        print("ERROR BUSCANDO CONOCIMIENTO EN SUPABASE:")
-        print(e)
+        print("ERROR BUSCANDO CONOCIMIENTO EN SUPABASE:", e, flush=True)
         return ""
 
 
@@ -102,8 +104,7 @@ def chat():
     ultima_pregunta = messages[-1]["content"] if messages else ""
     conocimiento = buscar_conocimiento_tallero(ultima_pregunta)
 
-    print("CONOCIMIENTO FINAL ENVIADO AL MODELO:")
-    print(conocimiento)
+    print("CONOCIMIENTO FINAL ENVIADO AL MODELO:", conocimiento[:1000], flush=True)
 
     openai_messages = [
         {
@@ -123,17 +124,11 @@ Normas de respuesta:
 - Utiliza párrafos cortos.
 - No proporciones costes orientativos salvo que el usuario los pida expresamente.
 - Si faltan datos importantes, primero solicita la información necesaria.
-- Si faltan datos como motor, año, combustible o kilómetros, no incluyas costes ni soluciones definitivas.
-- Cuando falten datos importantes, prioriza hacer preguntas antes de proponer soluciones o costes.
-- Evita respuestas largas en la primera consulta.
 - Si existen varias posibilidades, indícalas ordenadas de más frecuente a menos frecuente.
 - Prioriza siempre las averías más habituales y conocidas del modelo, motor y sistema afectado antes de proponer causas genéricas.
-- Ten en cuenta los fallos recurrentes de cada fabricante y motorización cuando la información del vehículo sea suficiente.
-- Evita proponer sustituciones costosas sin haber descartado previamente las averías más comunes.
 - Habla como un profesional de taller con experiencia práctica.
 - Mantén el contexto de la conversación.
 - Nunca vuelvas a solicitar información que el usuario ya haya proporcionado anteriormente.
-- Si un dato ya ha sido descartado, por ejemplo ausencia de códigos de avería, continúa el diagnóstico sin insistir en ello.
 - Si el usuario cambia de vehículo, empieza un nuevo diagnóstico para ese vehículo.
 - El vehículo mencionado más recientemente por el usuario tiene prioridad.
 
