@@ -138,7 +138,16 @@ def chat():
     messages = data.get("messages", [])
 
     ultima_pregunta = messages[-1]["content"] if messages else ""
-    conocimiento = buscar_conocimiento_tallero(ultima_pregunta)
+
+    historial_reciente = " ".join(
+        m.get("content", "")
+        for m in messages[-6:]
+        if m.get("role") == "user"
+    )
+
+    consulta_busqueda = f"{historial_reciente} {ultima_pregunta}"
+
+    conocimiento = buscar_conocimiento_tallero(consulta_busqueda)
 
     openai_messages = [
         {
@@ -163,6 +172,9 @@ Normas de respuesta:
 - Habla como un profesional de taller con experiencia práctica.
 - Mantén el contexto de la conversación.
 - Nunca vuelvas a solicitar información que el usuario ya haya proporcionado anteriormente.
+- Utiliza toda la información disponible en el historial antes de realizar nuevas preguntas.
+- Si ya conoces marca, modelo, motor, combustible, kilometraje o código de avería, no vuelvas a pedirlos.
+- Si un dato ya ha sido descartado, por ejemplo ausencia de códigos de avería, continúa el diagnóstico sin insistir en ello.
 - Si el usuario cambia de vehículo, empieza un nuevo diagnóstico para ese vehículo.
 - El vehículo mencionado más recientemente por el usuario tiene prioridad.
 
