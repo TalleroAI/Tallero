@@ -42,9 +42,6 @@ def buscar_conocimiento_tallero(texto):
         palabras = limpiar_palabras(texto)
         filtros = [p for p in palabras if len(p) >= 3]
 
-        print("CONSULTA USUARIO:", texto, flush=True)
-        print("FILTROS GENERADOS:", filtros, flush=True)
-
         if not filtros:
             return ""
 
@@ -57,18 +54,11 @@ def buscar_conocimiento_tallero(texto):
         )
 
         registros = respuesta.data or []
-
-        print("TOTAL REGISTROS SUPABASE:", len(registros), flush=True)
-
         resultados = []
 
         for item in registros:
             texto_completo = texto_item(item)
-            puntuacion = 0
-
-            for palabra in filtros:
-                if palabra in texto_completo:
-                    puntuacion += 1
+            puntuacion = sum(1 for palabra in filtros if palabra in texto_completo)
 
             if puntuacion > 0:
                 resultados.append((puntuacion, item))
@@ -83,16 +73,12 @@ Título: {item.get("titulo", "")}
 Motor: {item.get("motor", "")}
 Tags: {item.get("tags", "")}
 Resumen: {item.get("resumen", "")}
-JSON técnico: {item.get("json_completo", "")}
+Contenido técnico: {item.get("json_completo", "")}
 """)
-
-        print("DOCUMENTOS ENCONTRADOS:", len(documentos), flush=True)
-        print(documentos, flush=True)
 
         return "\n\n".join(documentos)
 
-    except Exception as e:
-        print("ERROR BUSCANDO CONOCIMIENTO EN SUPABASE:", e, flush=True)
+    except Exception:
         return ""
 
 
@@ -103,8 +89,6 @@ def chat():
 
     ultima_pregunta = messages[-1]["content"] if messages else ""
     conocimiento = buscar_conocimiento_tallero(ultima_pregunta)
-
-    print("CONOCIMIENTO FINAL ENVIADO AL MODELO:", conocimiento[:1000], flush=True)
 
     openai_messages = [
         {
