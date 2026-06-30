@@ -99,6 +99,7 @@ def chat():
     messages = data.get("messages", [])
 
     ultima_pregunta = messages[-1]["content"] if messages else ""
+    raise Exception("AQUI LLEGA EL CHAT")
     conocimiento = buscar_conocimiento_tallero(ultima_pregunta)
 
     print("CONOCIMIENTO FINAL ENVIADO AL MODELO:")
