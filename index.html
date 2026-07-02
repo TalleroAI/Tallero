@@ -3,56 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tallero AI</title>
+<title>Tallero AI Beta</title>
 
 <style>
+*{
+    box-sizing:border-box;
+}
 
 body{
     margin:0;
     font-family:Arial, Helvetica, sans-serif;
-    background:#f4f6f8;
+    background:#f3f4f6;
+    color:#111827;
+}
+
+.app{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
 }
 
 .header{
-    background:#1f2937;
+    background:#111827;
     color:white;
+    padding:20px;
     text-align:center;
-    padding:25px;
 }
 
 .header h1{
     margin:0;
-    font-size:38px;
+    font-size:34px;
 }
 
 .header p{
-    margin-top:10px;
+    margin:8px 0 0;
     color:#d1d5db;
 }
 
-.chat-container{
+.beta{
+    display:inline-block;
+    margin-top:12px;
+    background:#f59e0b;
+    color:#111827;
+    font-weight:bold;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:13px;
+}
+
+.notice{
     max-width:900px;
-    margin:40px auto;
+    margin:16px auto 0;
+    color:#e5e7eb;
+    font-size:14px;
+    line-height:1.4;
+}
+
+.chat-container{
+    width:100%;
+    max-width:950px;
+    margin:24px auto;
     background:white;
-    border-radius:15px;
-    box-shadow:0 0 20px rgba(0,0,0,0.08);
-    padding:30px;
+    border-radius:18px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    padding:24px;
+    display:flex;
+    flex-direction:column;
+    flex:1;
 }
 
 .messages{
-    height:400px;
+    height:55vh;
     overflow-y:auto;
     border:1px solid #e5e7eb;
-    border-radius:10px;
-    padding:20px;
-    margin-bottom:20px;
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:18px;
+    background:#f9fafb;
+}
+
+.message{
+    padding:14px 16px;
+    border-radius:14px;
+    margin-bottom:14px;
+    line-height:1.5;
+    font-size:15px;
 }
 
 .bot{
     background:#eef2ff;
-    padding:15px;
-    border-radius:10px;
-    margin-bottom:15px;
+    border:1px solid #dbe4ff;
+}
+
+.user{
+    background:#e5e7eb;
+    border:1px solid #d1d5db;
+}
+
+.thinking{
+    opacity:0.85;
+    font-style:italic;
 }
 
 .input-area{
@@ -62,74 +112,170 @@ body{
 
 input{
     flex:1;
-    padding:15px;
+    padding:16px;
     border:1px solid #d1d5db;
-    border-radius:10px;
+    border-radius:12px;
     font-size:16px;
+    outline:none;
+}
+
+input:focus{
+    border-color:#2563eb;
 }
 
 button{
     background:#2563eb;
     color:white;
     border:none;
-    border-radius:10px;
-    padding:15px 25px;
+    border-radius:12px;
+    padding:0 24px;
     cursor:pointer;
     font-size:16px;
+    font-weight:bold;
 }
 
 button:hover{
     background:#1d4ed8;
 }
 
-.footer{
-    text-align:center;
-    margin-top:20px;
+.examples{
+    margin-top:14px;
+    font-size:13px;
     color:#6b7280;
+    line-height:1.5;
 }
 
-</style>
+.footer{
+    text-align:center;
+    margin-top:18px;
+    color:#6b7280;
+    font-size:13px;
+}
 
+@media (max-width: 768px){
+    body{
+        background:white;
+    }
+
+    .header{
+        padding:16px 14px;
+    }
+
+    .header h1{
+        font-size:28px;
+    }
+
+    .header p{
+        font-size:14px;
+    }
+
+    .notice{
+        font-size:13px;
+        padding:0 8px;
+    }
+
+    .chat-container{
+        margin:0;
+        border-radius:0;
+        box-shadow:none;
+        padding:12px;
+        min-height:calc(100vh - 150px);
+    }
+
+    .messages{
+        height:calc(100vh - 315px);
+        padding:12px;
+        border-radius:12px;
+    }
+
+    .message{
+        font-size:15px;
+        padding:13px;
+    }
+
+    .input-area{
+        gap:8px;
+    }
+
+    input{
+        padding:14px;
+        font-size:15px;
+    }
+
+    button{
+        padding:0 16px;
+        font-size:15px;
+    }
+
+    .examples{
+        display:none;
+    }
+}
+
+@media (max-width: 420px){
+    .input-area{
+        flex-direction:column;
+    }
+
+    button{
+        padding:14px;
+        width:100%;
+    }
+
+    .messages{
+        height:calc(100vh - 360px);
+    }
+}
+</style>
 </head>
 
 <body>
+<div class="app">
 
-<div class="header">
-    <h1>Tallero AI</h1>
-    <p>Asistente técnico para talleres y profesionales de automoción</p>
-</div>
+    <div class="header">
+        <h1>Tallero AI</h1>
+        <p>Asistente técnico para talleres y profesionales de automoción</p>
+        <div class="beta">VERSIÓN BETA</div>
+        <div class="notice">
+            Tallero AI se encuentra en fase de pruebas. Las respuestas son orientativas y deben verificarse antes de realizar cualquier reparación.
+        </div>
+    </div>
 
-<div class="chat-container">
+    <div class="chat-container">
 
-    <div class="messages">
+        <div class="messages">
+            <div class="message bot">
+                <strong>Tallero AI:</strong><br>
+                Hola. Soy Tallero AI, tu asistente técnico para automoción.
+                <br><br>
+                Puedes consultarme sobre diagnosis, códigos OBD, mantenimiento, averías, motores, lubricantes, recambios y procedimientos técnicos.
+            </div>
+        </div>
 
-        <div class="bot">
-            Hola. Soy Tallero AI.
-            <br><br>
-            Puedo ayudarte con:
-            <ul>
-                <li>Diagnóstico de averías</li>
-                <li>Códigos OBD</li>
-                <li>Mantenimiento</li>
-                <li>Información técnica</li>
-                <li>Recambios y consumibles</li>
-            </ul>
+        <div class="input-area">
+            <input id="userInput" type="text" placeholder="Describe una avería, código OBD, vehículo o consulta técnica...">
+            <button onclick="enviarMensaje()">Enviar</button>
+        </div>
+
+        <div class="examples">
+            Ejemplos: “P0401 en Golf 2.0 TDI”, “BMW B38 problemas frecuentes”, “¿Qué pasa si falla el pulverizador de aceite?”
+        </div>
+
+        <div class="footer">
+            Tallero AI Beta v0.1
         </div>
 
     </div>
-
-    <div class="input-area">
-    <input id="userInput" type="text" placeholder="Escribe tu consulta...">
-    <button onclick="enviarMensaje()">Enviar</button>
 </div>
 
-    <div class="footer">
-        Versión inicial de Tallero AI
-    </div>
-
-</div>
 <script>
 let historial = [];
+
+document.getElementById("userInput").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        enviarMensaje();
+    }
+});
 
 async function enviarMensaje() {
     const input = document.getElementById("userInput");
@@ -140,59 +286,82 @@ async function enviarMensaje() {
     const mensajes = document.querySelector(".messages");
 
     mensajes.innerHTML += `
-        <div class="bot">
+        <div class="message user">
             <strong>Tú:</strong><br>
             ${mensaje}
         </div>
     `;
-mensajes.scrollTop = mensajes.scrollHeight;
+
+    mensajes.scrollTop = mensajes.scrollHeight;
+
     historial.push({
         role: "user",
         content: mensaje
     });
 
     input.value = "";
-const estados = [
-    "Analizando avería...",
-    "Revisando posibles causas...",
-    "Comprobando síntomas...",
-    "Evaluando diagnóstico...",
-    "Procesando información del vehículo..."
-];
 
-const estadoAleatorio = estados[Math.floor(Math.random() * estados.length)];
+    const estados = [
+        "Analizando avería...",
+        "Revisando posibles causas...",
+        "Comprobando síntomas...",
+        "Consultando base técnica...",
+        "Evaluando diagnóstico...",
+        "Procesando información del vehículo..."
+    ];
 
-mensajes.innerHTML += `
-    <div class="bot thinking" id="thinking">
-        <strong>Tallero AI:</strong><br>
-        ${estadoAleatorio}
-    </div>
-`;
+    const estadoAleatorio = estados[Math.floor(Math.random() * estados.length)];
 
-mensajes.scrollTop = mensajes.scrollHeight;
-    const respuesta = await fetch("/chat", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            messages: historial
-        })
-    });
-
-    const data = await respuesta.json();
-document.getElementById("thinking")?.remove();
     mensajes.innerHTML += `
-        <div class="bot">
+        <div class="message bot thinking" id="thinking">
             <strong>Tallero AI:</strong><br>
-            ${data.reply.replace(/\n/g, "<br>")}
+            ${estadoAleatorio}
         </div>
     `;
-mensajes.scrollTop = mensajes.scrollHeight;
-    historial.push({
-        role: "assistant",
-        content: data.reply
-    });
+
+    mensajes.scrollTop = mensajes.scrollHeight;
+
+    try {
+        const respuesta = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                messages: historial
+            })
+        });
+
+        const data = await respuesta.json();
+
+        document.getElementById("thinking")?.remove();
+
+        mensajes.innerHTML += `
+            <div class="message bot">
+                <strong>Tallero AI:</strong><br>
+                ${data.reply.replace(/\n/g, "<br>")}
+            </div>
+        `;
+
+        mensajes.scrollTop = mensajes.scrollHeight;
+
+        historial.push({
+            role: "assistant",
+            content: data.reply
+        });
+
+    } catch (error) {
+        document.getElementById("thinking")?.remove();
+
+        mensajes.innerHTML += `
+            <div class="message bot">
+                <strong>Tallero AI:</strong><br>
+                Ha ocurrido un error temporal. Inténtalo de nuevo.
+            </div>
+        `;
+
+        mensajes.scrollTop = mensajes.scrollHeight;
+    }
 }
 </script>
 </body>
